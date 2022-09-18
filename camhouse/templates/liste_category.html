@@ -1,0 +1,408 @@
+{% extends 'home_ch.html' %}
+{% load myFilter %}
+{% load static %}
+{% block contenu_ch %}
+
+    <script src="{% static 'js/jquery.js' %}"></script>
+        {% include 'header.html'%}
+    <div class="container-fluid row">
+    {% for list in listes %}
+        {% if list.etat == 1 %}
+                <div class="col-lg-3">
+            <div class="card ">
+                <img src="{{ list.image.url }}" data-toggle="modal" data-target="#staticBackdrop{{ list.id }}" class="img-thumbnail">
+                {% if list.nom is not None %}
+                    <p class="text-cam"> {% if list.category_id == 8 %} citée : {% else %}{{ list.category }} {% endif %} {{ list.nom|myddb }}</p>
+                {% endif %}
+            {% if list.category_id != 2 and list.category_id != 3 and list.category_id != 8 %}
+                            <div class="font-italic text-cam">Montant: {{ list.sommes }}  </div>
+            {% endif %}
+                <ul class="list-group list-group-flush text-cam">
+                    <p class="card-text text-cam">
+                    {{ list.region|myddb }} - {{ list.arrondissement|myddb }}
+                    </p>
+                </li>
+
+                    {% if list.nbchambre is not None or list.nbdouche is not None%}<li class="list-group-item text-cam">{% if list.nbchambre is not None and list.nbchambre != 0  %} {{ list.nbchambre }} chambre(s) {% endif %} {% if list.nbdouche is not None and list.nbdouche != 0 %}{{ list.nbdouche }} douche(s) {% endif %}</li>{% endif %}
+                    {% if list.nbcuisine is not None or list.nbsalon  is not None %}<li class="list-group-item text-cam">{% if list.nbcuisine is not None and list.nbcuisine != 0  %} {{ list.nbcuisine }} cuisine(s) {% endif %}  {% if list.nbsalon is not None and list.nbsalon != 0  %}{{ list.nbsalon }} salon(s)  {% endif %}</li>{% endif %}
+                    {% if list.nbinfrastructure is not None and list.nbinfrastructure != 0  %}<li class="list-group-item text-cam"> {{ list.nbinfrastructure }} infrastructure(s)</li>{% endif %}
+                </ul>
+                <div class="card-body row" >
+                    <a href="{% url 'camer_house:detail_category' list.id %}" title="detail" class="text-cam  btn btn-outline-light">
+                        <li class="fa fa-hourglass"><p style="font-size: 10px;">detail</p></li>
+                    </a>
+                    {% if list.category_id != 2 and list.category_id != 3 and list.category_id != 8 %} <div class="text-cam  btn btn-outline-light" data-toggle="modal" data-target="#Reserver{{ list.id }}" title="Reserver "> <li class="fa fa-laptop"><p style="font-size: 10px;">reserver</p></li> </div>{% endif %}
+                    {% if list.user_id != user.id %} <a href="#" class="text-cam btn btn-outline-light" title="message{{ user.username }}vs{{ list.user.username }}" data-toggle="modal" data-target="#message{{ list.id }}"><li class="fa fa-comment"><p style="font-size: 10px;">message</p></li></a>{% endif %}
+                    <a href="#" class="text-cam  btn btn-outline-light" id="info{{ list.id }}" data-toggle="modal" data-target="#information{{ list.id }}" title="information sur le propriétaire"><li class="fa fa-phone"><p style="font-size: 10px;">information</p></li> </a>
+                    <a href="#" class="text-cam  btn btn-outline-light" title="partager" id="partager{{ list.id }}"><li class="fa fa-share"><p style="font-size: 10px;">partager</p></li> </a>
+                    <a href="#" class="text-cam  btn btn-outline-light" title="emplacement GPS" data-toggle="modal" data-target="#gps{{ list.id }}"><li class="fa fa-map-marker"><p style="font-size: 10px;">GPS</p></li> </a>
+
+                </div>
+        </div>
+            </div>
+
+            <div class="modal fade" id="Reserver{{ list.id }}" tabindex="-1" data-backdrop="static" aria-labelledby="Reserver{{ list.id }}" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+              <h5 class="modal-title text-cam">Reservation  {{ list.category }}</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+        <div class="modal-body">
+        {% if montant < 1000 %}
+
+                <p class="text-cam">les frais de reservations de cette {{ list.category }} est de 1000 Fcfa</p>
+            <p class="text-cam">votre solde est insufisant pour éffectuer cette opération . <br /> veuiller recharger votre compte</p>
+
+          {% endif %}
+        {% if montant >= 1000 %}
+        <p class="text-cam">en confirmant votre reservation, vous êtes à 50% propriétaire de cette {{ list.category }}. aucunne autre reservation seras disponible
+        pour cette {{ list.category }}</p>
+            <p class="text-cam">si après 7 jours votre reservation n'est pas confirmer par le propriétaire de cette {{ list.category }}, elle seras automatiquement annuler</p>
+        {% endif %}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+   {% if montant >= 1000 %}
+       <form action="" method="post" novalidate>
+       {% csrf_token %}
+       {{ formReserve.proprietaire }}
+           <input type="hidden" name="montant" value="0">
+           <input type="hidden" name="type" value="puol">
+           <input type="hidden" name="puol" value="{{ list.id }}" />
+
+           <button  type="submit" class="btn btn-success">Confirmer la reservation</button>
+       </form>
+   {% endif %}
+      </div>
+
+    </div>
+  </div>
+</div>
+
+  <div class="modal fade " id="information{{ list.id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Information</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+          {% if autorisation == 1 %}
+              <p class="text-cam" id="pay"></p>
+              <p class="text-cam" id="code"></p>
+              <p class="text-cam" id="number"></p>
+              <p class="text-cam" id="date"></p>
+
+          {% elif autorisation == 0 and montant < 500 %}
+              <p class="text-cam">les frais de consultation de cette {{ list.category }} est de 500 Fcfa valide pendant 2 jours</p>
+              <hr>
+              <p class="text-cam">veuillez cliquer sur l'iconne <i class="fa fa-info" ></i> situer à la gauche de votre écrant pour plus d'information </p>
+              <hr>
+            <p class="text-cam">votre solde est insufisant pour éffectuer cette opération . <br /> veuiller recharger votre compte</p>
+          {% elif autorisation == 0 and montant >= 500 %}
+              <p class="text-cam">les frais de consultation de cette {{ list.category }} est de 500 Fcfa valide pendant 2 jours</p>
+              <hr>
+              <p class="text-cam">durant ces 2 jours, vous pourrez éffectuer des consultations sur tous les catalogues(maison, hotel, studio, appartement, ect...) </p>
+              <hr>
+              <p class="text-cam"> <mask>NB</mask>: cliquer sur valider pour autoriser les consulttion </p>
+          {% endif %}
+      </div>
+        {% if autorisation == 0 and montant >= 500 %}
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id = "ValiderConsultationi{{list.id}}" data-dismiss="modal" >Valider</button>
+            </div>
+            <script>
+            $("#ValiderConsultationi{{list.id}}").click(function () {
+                var etab = {{list.id}};
+                        $.ajax({
+                            url:  "{% url 'camer_house:consultation' %}",
+                            method: "POST",
+                            data: 'id='+ etab,
+                            dataType: "json",
+                            success: function(data)
+                            {
+                                if (data.resultat == "yes"){
+                                alert("opération éffectuer avec success.");
+                            }
+                            else {
+                                    alert(data.resultat)
+                                }
+                            }
+                        });
+            })
+            </script>
+
+        {% endif %}
+    </div>
+  </div>
+</div>
+  <div class="modal fade" id="message{{ list.id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true" data-backdrop="static">
+  <div class="modal-dialog modal-dialog-scrollable">
+    <div class="modal-content"  style="width: 100vmax; height: 100vmax;">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Messageri</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+          {% if autorisation == 1 %}
+              <p class="text-cam" id="messages"> </p>
+
+          {% elif autorisation == 0 and montant < 500 %}
+              <p class="text-cam">les frais de consultation de cette {{ list.category }} est de 500 Fcfa valide pendant 2 jours</p>
+              <hr>
+              <p class="text-cam">veuillez cliquer sur l'iconne <i class="fa fa-info" ></i> situer à la gauche de votre écrant pour plus d'information </p>
+              <hr>
+            <p class="text-cam">votre solde est insufisant pour éffectuer cette opération . <br /> veuiller recharger votre compte</p>
+          {% elif autorisation == 0 and montant >= 500 %}
+              <p class="text-cam">les frais de consultation de cette {{ list.category }} est de 500 Fcfa valide pendant 2 jours</p>
+              <hr>
+              <p class="text-cam">durant ces 2 jours, vous pourrez éffectuer des consultations sur tous les catalogues (maison, hotel, studio, appartement, ect...) </p>
+              <hr>
+              <p class="text-cam"> <mask>NB</mask>: cliquer sur valider pour autoriser les consulttion </p>
+          {% endif %}
+      </div>
+        {% if autorisation == 0 and montant >= 500 %}
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id = "ValiderConsultationm{{list.id}}" data-dismiss="modal" >Valider</button>
+            </div>
+            <script>
+            $("#ValiderConsultationm{{list.id}}").click(function () {
+                var etab = {{list.id}};
+                        $.ajax({
+                            url:  "{% url 'camer_house:consultation' %}",
+                            method: "POST",
+                            data: 'id='+ etab,
+                            dataType: "json",
+                            success: function(data)
+                            {
+                                if (data.resultat == "yes"){
+                                alert("opération éffectuer avec success.");
+                            }
+                            else {
+                                    alert(data.resultat)
+                                }
+                            }
+                        });
+            })
+            </script>
+
+        {% elif autorisation == 1 %}
+            <form class="form-inline" id="form">
+            <input name="message" class="form-control" type="text" required>
+            <button type="submit"  class=" btn btn-success"  ><i class="fa fa-location-arrow"></i></button>
+            </form>
+        {% endif %}
+    </div>
+  </div>
+</div>
+  <div class="modal fade " id="gps{{ list.id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Localisation</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+          {% if autorisation == 1 %}
+              <p class="text-cam">GPS ici</p>
+              <!DOCTYPE html>
+
+<button onclick="getLocation()">Try It</button>
+
+<p id="demo"></p>
+
+<script>
+var x = document.getElementById("demo");
+
+function getLocation() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(showPosition);
+  } else {
+    x.innerHTML = "Geolocation is not supported by this browser.";
+  }
+}
+
+function showPosition(position) {
+  x.innerHTML = "Latitude: " + position.coords.latitude +
+  "<br>Longitude: " + position.coords.longitude;
+}
+</script>
+
+
+          {% elif autorisation == 0 and montant < 500 %}
+              <p class="text-cam">les frais de consultation de cette {{ list.category }} est de 500 Fcfa valide pendant 2 jours</p>
+              <hr>
+              <p class="text-cam">veuillez cliquer sur l'iconne <i class="fa fa-info" ></i> situer à la gauche de votre écrant pour plus d'information </p>
+              <hr>
+            <p class="text-cam">votre solde est insufisant pour éffectuer cette opération . <br /> veuiller recharger votre compte</p>
+          {% elif autorisation == 0 and montant >= 500 %}
+              <p class="text-cam">les frais de consultation de cette {{ list.category }} est de 500 Fcfa valide pendant 2 jours</p>
+              <hr>
+              <p class="text-cam">durant ces 2 jours, vous pourrez éffectuer des consultations sur tous les catalogues (maison, hotel, studio, appartement, ect...)</p>
+              <hr>
+              <p class="text-cam"> <mask>NB</mask>: cliquer sur valider pour autoriser les consulttion </p>
+          {% endif %}
+      </div>
+        {% if autorisation == 0 and montant >= 500 %}
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id = "ValiderConsultationg{{list.id}}" data-dismiss="modal" >Valider</button>
+            </div>
+            <script>
+            $("#ValiderConsultationg{{list.id}}").click(function () {
+                var etab = {{list.id}};
+                        $.ajax({
+                            url:  "{% url 'camer_house:consultation' %}",
+                            method: "POST",
+                            data: 'id='+ etab,
+                            dataType: "json",
+                            success: function(data)
+                            {
+                                if (data.resultat == "yes"){
+                                alert("opération éffectuer avec success.");
+                            }
+                            else {
+                                    alert(data.resultat)
+                                }
+                            }
+                        });
+            })
+            </script>
+
+        {% endif %}
+    </div>
+  </div>
+</div>
+
+            <script>
+                $(document).ready(function() {
+                    $("#info{{ list.id }}").click(function() {
+                        var etab = {{list.id}};
+                        $.ajax({
+                            url:  "{% url 'camer_house:donnee' %}",
+                            method: "POST",
+                            data: 'id='+ etab,
+                            dataType: "json",
+                            success: function(data)
+                            {
+                                x=data.donnee;
+                                for(i=0; i<x.length; i++ ){
+                                    var phonenumber = x[i].phonenumber;
+                                    var day = new Date(x[i].day*1000) ;
+                                    var code = x[i].code;
+                                    var pay = x[i].pay;
+                                }
+                                $(" #pay").html("pays :  "+ pay);
+                                $(" #code").html("code :  "+ code);
+                                $(" #number").html("numero de téléphonne :  "+ phonenumber);
+                                $(" #date").html("date d'ajout :  "+ day.getDate()+
+                                                                  "-"+(day.getMonth()+1)+
+                                                                  "-"+day.getFullYear()+
+                                                                  " "+day.getHours()+
+                                                                  "H:"+day.getMinutes());
+
+                            }
+                        });
+                    });
+                    $("#partager{{ list.id }}").click(function () {
+                        alert("copier ce lien http://localhost:8000/camhouse/detail_category/{{ list.id }}/ et envoyer leux à une de vos connaissance (son username)");
+                    });
+                });
+            </script>
+
+
+                <div class="modal fade" id="staticBackdrop{{ list.id }}" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+              <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                      <span aria-hidden="true">&times;</span>
+                    </button>
+                  </div>
+                  <div class="modal-body">
+                      <li class="list-group-item text-cam col"> {{list.description|myddb }}</li>
+                    <img src="{{ list.image.url }}" class="img-thumbnail col"  style="height: 50%; width: 100%;" >
+                  </div>
+                    <div class="modal-footer">
+                        <a href="{% url 'camer_house:detail_category' list.id %}" class="text-cam  btn btn-outline-info">Plus de Détail</a>
+                            {% if list.category_id != 2 and list.category_id != 3 and list.category_id != 8 %}
+                            <div class="text-cam"><strong>Montant:</strong> {{ list.sommes }} <strong>fcfa</strong></div>
+                            {% endif %}
+                                {% if list.nbchambre is not None or list.nbdouche is not None%}<li class="list-group-item text-cam">{% if list.nbchambre is not None and list.nbchambre != 0  %} {{ list.nbchambre }} chambre(s) {% endif %}  {% if list.nbdouche is not None and list.nbdouche != 0 %} - {{ list.nbdouche }} douche(s) {% endif %}</li>{% endif %}
+                                {% if list.nbcuisine is not None or list.nbsalon  is not None %}<li class="list-group-item text-cam">{% if list.nbcuisine is not None and list.nbcuisine != 0  %} {{ list.nbcuisine }} cuisine(s) {% endif %}  {% if list.nbsalon is not None and list.nbsalon != 0  %} - {{ list.nbsalon }} salon(s)  {% endif %}</li>{% endif %}
+                                {% if list.nbinfrastructure is not None and list.nbinfrastructure != 0  %}<li class="list-group-item text-cam"> {{ list.nbinfrastructure }} infrastructure(s)</li>{% endif %}
+
+                    </div>
+                </div>
+              </div>
+            </div>
+        {% endif %}
+                <script>
+        let url = `ws://${window.location.host}/ws/socket-server/`
+
+        const chatSocket = new WebSocket(url)
+
+        chatSocket.onmessage = function(e){
+            let data = JSON.parse(e.data)
+            console.log('Data:', data)
+
+            if(data.type === 'chat'){
+                let messages = document.getElementById('messages')
+
+                messages.insertAdjacentHTML('beforeend', `<div>
+                                        <p>${data.message}</p>
+                                    </div>`)
+            }
+        }
+
+        let form = document.getElementById('form')
+        form.addEventListener('submit', (e)=> {
+            e.preventDefault()
+            let message = e.target.message.value
+            chatSocket.send(JSON.stringify({
+                'message':message,
+                "idh": {{ list.id }},
+                "user": {{ user.id }}
+            }))
+            form.reset()
+        })
+
+    </script>
+
+    {% endfor %}
+    </div>
+    <div>
+    <ul class="pagination justify-content-center">
+        {% if listes.has_previous %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ listes.previous_page_number }}">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+        {% endif %}
+    {% if listes.has_next or listes.has_previous %}
+        <li class="page-item"><p class="page-link text-muted">Page {{ listes.number }} of {{ listes.paginator.num_pages }}</p></li>
+    {% endif %}
+     {% if listes.has_next %}
+            <li class="page-item">
+                <a class="page-link" href="?page={{ listes.next_page_number }}">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+        {% endif %}
+    </ul>
+    </div>
+
+{% endblock contenu_ch %}

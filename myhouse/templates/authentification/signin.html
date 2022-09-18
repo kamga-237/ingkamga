@@ -1,0 +1,133 @@
+{% extends 'myhouse.html' %}
+{% block title %}
+    CREER UN COMPTE
+{% endblock %}
+{% block body %}
+    <div class="container">
+        <div class="col-lg-5 m-auto">
+            <form action="" method="post" novalidate>
+                {% csrf_token %}
+                <div class="card mt-6 bg-light">
+{% if messages %}
+                       {% for message in messages %}
+                              <div class="alert alert-danger text-center"><strong>{{ message }}</strong></div>
+                       {% endfor %}
+
+                {% endif %}
+                    <div class="card-header text-center">
+                        <i class="date-icon">création du compte</i>
+                    </div>
+                    <div class="card-body">
+                        <label for="id_username">Nom d'utilisateur</label>
+                        {% if form.username.errors %}
+                            {% for error in form.username.errors %}
+                              <small class="text-danger">{{ error }}</small>
+                            {% endfor %}
+                        {% endif %}
+                                       {{ form.username }}
+
+
+                    <label for="id_email">Email</label>
+                        {% if form.email.errors %}
+                            {% for error in form.email.errors %}
+                              <small class="text-danger">{{ error }}</small>
+                            {% endfor %}
+                        {% endif %}
+                                       {{ form.email }}
+
+                        <label for="code">pays</label>
+                    <select id="code" class="form-control" name="pays" required>
+                        <option selected disabled> </option>
+                            {% for code in codes %}
+                                <option value="{{ code.name }}">{{ code.name }}</option>
+                            {% endfor %}
+                    </select>
+
+
+                        <label for="id_phonenumber">Phone Number</label>
+                    <div class="row">
+                    <div class="col-lg-2" id="dial_code"></div> <div class="col-lg-10">{{ profile.phonenumber }}</div>
+                    </div>
+
+
+{{ profile.day }}
+{{ profile.pay }}
+{{ profile.code }}
+{{ compte.day }}
+{{ compte.montant }}
+
+                        <label for="id_password1">Mot de passe</label>
+                    {% if form.password1.errors %}
+                        {% for error in form.password1.errors %}
+                                     <div><small class="text-danger"> {{ error }} </small> </div>
+                        {% endfor %}
+                    {% endif %}
+                    {{ form.password1 }}
+
+                        <label for="id_password2">Confirmer Mot de passe</label>
+                    {% if form.password2.errors %}
+                        {% for error in form.password2.errors %}
+                                     <div><small class="text-danger"> {{ error }} </small> </div>
+                        {% endfor %}
+                    {% endif %}
+                    {{ form.password2 }}
+
+                    </div>
+                    <div class="card-footer text-center">
+                        <button class="btn btn-primary btn-block">creer</button>
+                    </div>
+                    <p> vous avez un compte?
+                        <a href="{% url 'login' %}">connexion</a>
+                    </p>
+                </div>
+            </form>
+
+        </div>
+    </div>
+
+                                <script>
+                                    $("#code").change(function () {
+                                        div = document.getElementById('dial_code');
+                                        {% for dial_codes in codes %}
+
+                                            if ($("#code").val() == "{{ dial_codes.name }}"){
+                                                var code = "{{ dial_codes.dial_code }}";
+                                            }
+                                        {% endfor %}
+                                        txt = div.innerHTML = code;
+                                    });
+                                </script>
+    <style>
+    body{
+        background: url("../../../media/83.jpg");
+        background-size: 100%;
+        background-repeat: no-repeat;
+        min-height: 1000%;
+        opacity: 0.8;
+    }
+    </style>
+
+
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,84 @@
+<div class="navbar navbar-light text-cam">
+  <a class="navbar-brand">
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#staticBackdrop">
+  Recherche ultrat rapide
+</button>
+  </a>
+    <a class="btn btn-outline-success text-cam" href="{% url 'camer_house:message' %}"> <li class="fa fa-comment fa-3x" style="color: teal" title="Message"></li> </a>
+  <form class="form-inline" method="get" action="{% url 'camer_house:search_ch' %}" >
+<input class="form-control text-cam" name="search" type="search" placeholder="entrez un mot ou une somme" aria-label="Search" required>
+     &nbsp;<label for="ca" class="text-cam">Categorie: </label>
+      <select class="form-control" id="ca" name="category" required>
+      <option class="text-cam" selected disabled> </option>
+ {% for categori in sategory %}
+     <option class="text-cam" value="{{ categori.id }}">{{ categori.name }}</option>
+            {% endfor %}
+    </select>
+    &nbsp; &nbsp;<button class="btn btn-outline-success my-2 my-sm-0 text-cam" type="submit">Search</button>
+  </form>
+</div>
+
+<div class="modal fade" id="staticBackdrop" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content text-cam">
+      <div class="modal-header">
+        <h5 class="modal-title font-italic" id="staticBackdropLabel">Recherche ultrat rapide</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+              <form action="{% url 'camer_house:rapid_search_ch' %}" method="GET">
+      <div class="modal-body">
+              <div class="row">
+                  <div class="col-md-6">
+                      <label for="region" class="font-italic">region</label>
+                      <input type="text" class="form-control" id="region" name="region" required />
+                  </div>
+                  <div class="col-md-6">
+                      <label for="arrondissement" class="font-italic">arrondissement</label>
+                      <input type="text" class="form-control" id="arrondissement" name="arrondissement" required />
+                  </div>
+              </div>
+              <div class="row">
+                  <div class="col-md-3">
+                      <label for="chambre" class="font-italic">nombre de chambre</label>
+                      <input type="number" min="1" class="form-control" id="chambre" name="chambre" required />
+                  </div>
+                  <div class="col-md-3">
+                      <label for="salon" class="font-italic"> nombre de salon</label>
+                      <input type="number" min="1" class="form-control" id="salon" name="salon" required />
+                  </div>
+
+                  <div class="col-md-3">
+                      <label for="cuisine" class="font-italic">nombre de cuisine</label>
+                      <input type="number" min="1" class="form-control" id="cuisine" name="cuisine" required />
+                  </div>
+                  <div class="col-md-3">
+                      <label for="douche" class="font-italic"> nombre de douche</label>
+                      <input type="number" min="1" class="form-control" id="douche" name="douche" required />
+                  </div>
+              </div>
+              <div class="row">
+                  <div class="col-md-6">
+                      <label for="category" class="font-italic">Category</label>
+                      <select class="form-control" id="category" name="category" required>
+                          <option selected disabled> </option>
+                          {% for categori in sategory %}
+                              <option value="{{ categori.id }}" class="font-italic">{{ categori.name }}</option>
+                          {% endfor %}
+                      </select>
+                  </div>
+              <div class="col-md-6">
+                  <label for="somme" class="font-italic">Montant</label>
+                  <input type="number" class="form-control" min="1000" name="somme" required />
+              </div>
+              </div>
+          <div class="modal-footer">
+        <button type="button" class="btn btn-secondary font-italic" data-dismiss="modal">fermer</button>
+        <button type="submit" class="btn btn-primary font-italic">rechercher</button>
+      </div>
+      </div>
+      </form>
+    </div>
+  </div>
+</div>

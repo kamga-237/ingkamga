@@ -1,0 +1,439 @@
+{% extends 'home_ch.html' %}
+{% load myFilter %}
+{% load static %}
+{% block contenu_ch %}
+        <script src="{% static 'js/jquery.js' %}"></script>
+    <div class="container-fluid row">
+        <div class="col-lg-12  pascal">
+            <form class="form-inline float-right" method="get" action=" {% url 'camer_house:enregistrement_ch' %}" >
+                <label for="cat" class="text-cam">&nbsp; Catégorie: &nbsp</label>
+                <select id="cat" class="form-control" name="category" required>
+                    <option selected disabled> </option>
+                    {% for categori in sategory %}
+                        <option value="{{ categori.id }}">{{ categori.name }}</option>
+                    {% endfor %}
+                </select>
+                &nbsp; &nbsp;<button class="btn btn-outline-success my-2 my-sm-0 text-cam" type="submit">Ajouter une House</button>
+            </form>
+        </div>
+
+                {% if messages %}
+                       {% for message in messages %}
+                              <div class='row col-lg-12  alert {% if r == 1 %} alert-success {% elif r == 2 %} alert-danger {% endif %} ' style="text-align: center;" id="message" role='alert'>
+                                  <strong>{{ message }}</strong>
+                              </div>
+                       {% endfor %}
+
+                {% endif %}
+
+
+            <div class="row col-lg-12 pascal">
+                {% if liste_maison_number%}
+                    {% for liste_maison in liste_maisons %}
+        <div class="col-lg-3">
+            <div class="card">
+                <img src="{{ liste_maison.image.url }}" class="img-thumbnail" >
+            {% if liste_maison.nom is not None %}
+                 <p class="text-cam"> {{ liste_maison.category }} {{ liste_maison.nom | myddb}}</p>
+            {% endif %}
+            {% if liste_maison.category_id != 2 and liste_maison.category_id != 3  and liste_maison.category_id != 8 %}
+                            <div class="font-italic text-cam">Montant: {{ liste_maison.sommes }}  </div>
+            {% endif %}
+                <div class="card-body">
+                    <h6 class="card-title text-cam">{{ liste_maison.region|myddb }} - {{ liste_maison.arrondissement|myddb }} &nbsp; &nbsp;
+                          {% if liste_maison.etat ==  1 %}
+
+                    <div data-toggle="modal" data-target="#exampleModalnotif{{ liste_maison.id }}"><li class="fa fa-eye notificate{{ liste_maison.id }}" ><span id="notif{{ liste_maison.id }}" class="class='badge badge-pill mb-2" style="font-size: 10px;"></span></li></div>
+                              <div class="modal fade" id="exampleModalnotif{{ liste_maison.id }}" tabindex="-1" aria-labelledby="exampleModalLabelnotif{{ liste_maison.id }}" aria-hidden="true">
+                              <div class="modal-dialog">
+                                <div class="modal-content">
+                                  <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">Notification</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                      <span aria-hidden="true">&times;</span>
+                                    </button>
+                                  </div>
+                                  <div class="modal-body">
+                                      <table class="table  table-dark table-striped">
+                                          <thead>
+                                            <tr>
+                                              <th scope="col">#</th>
+                                              <th scope="col">user</th>
+                                              <th scope="col">&numero; : </th>
+                                              <th scope="col">Date</th>
+                                            </tr>
+                                          </thead>
+                                           <tbody id="liste{{ liste_maison.id }}">
+
+                                           <tbody>
+                                      </table>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                              <script>
+                              var puol = {{ liste_maison.id }};
+                              var user = {{ liste_maison.user_id }};
+                              var id = 0;
+                              $.ajax({
+                                url:  "{% url 'camer_house:notif' %}",
+                                method: "POST",
+                                data: {puol:puol , moi:user, db:id},
+                                dataType: "json",
+                                  success(data){
+                                    $("#notif{{ liste_maison.id }}").html(data.resultat);
+                                  }
+                            });
+
+                              $(".notificate{{ liste_maison.id }}").click(function () {
+                                  var puol = {{ liste_maison.id }};
+                                  var user = 0;
+                                  var id = 0;
+                                  var outplus = "";
+                                  $.ajax({
+                                      url:  "{% url 'camer_house:notif' %}",
+                                      method: "POST",
+                                      data: {puol:puol , moi:user, db:id},
+                                      dataType: "json",
+                                      success(data){
+                                          x = data.resultat
+                                          for (i=0; i<x.length; i++){
+                                              outplus += "<tr>  <td>"+ i +"</td><td>"+x[i].proprietaire+
+                                                  "</td> <td>"+x[i].phonenumber+
+                                                  "</td> <td>"+ new Date(x[i].date*1000).getDate()+
+                                                                  "-"+ new Date(x[i].date*1000).getMonth()+
+                                                                  "-"+ new Date(x[i].date*1000).getFullYear()+
+                                                                  " à "+ new Date(x[i].date*1000).getHours()+
+                                                                  "H:"+ new Date(x[i].date*1000).getMinutes()+
+                                                  "</td> </tr> ";
+                                          }
+                                          $("#liste{{ liste_maison.id }}").html(outplus);
+                                      }
+                                  });
+                              });
+
+                              </script>
+
+                    {% endif %}
+                    </h6>
+
+                </div>
+                <ul class="list-group list-group-flush">
+                    {% if liste_maison.nbchambre is not None or liste_maison.nbdouche is not None %}<li class="list-group-item text-cam">{% if liste_maison.nbchambre is not None and liste_maison.nbchambre != 0  %} {{ liste_maison.nbchambre }} chambre(s) {% endif %}  {% if liste_maison.nbdouche is not None and liste_maison.nbdouche != 0 %} - {{ liste_maison.nbdouche }} douche(s) {% endif %}</li>{% endif %}
+                    {% if liste_maison.nbcuisine is not None or liste_maison.nbsalon  is not None %}<li class="list-group-item text-cam">{% if liste_maison.nbcuisine is not None and liste_maison.nbcuisine != 0  %} {{ liste_maison.nbcuisine }} cuisine(s) {% endif %}  {% if liste_maison.nbsalon is not None and liste_maison.nbsalon != 0  %} - {{ liste_maison.nbsalon }} salon(s)  {% endif %}</li>{% endif %}
+                    {% if liste_maison.nbinfrastructure is not None and liste_maison.nbinfrastructure != 0  %}<li class="list-group-item text-cam"> {{ liste_maison.nbinfrastructure }} infrastructure(s)</li>{% endif %}
+                </ul>
+                <div class="card-body row">
+                    {% if liste_maison.etat == 1 %}
+                        <a href="{% url 'camer_house:enregistrement22_ch' liste_maison.id %}" title="detail" class="text-cam col btn-outline-light">
+                        <li class="fa fa-hourglass"><p style="font-size: 10px;">detail</p></li>
+                        </a>
+                        {% if liste_maison.category_id != 8 %}
+                        <a href="#" class="text-cam col  btn-outline-light" data-backdrop="static" data-toggle="modal" data-target="#modalConfirmDupliquer{{ liste_maison.id }}" data-dismiss="modal"><li class="fa fa-file"><p style="font-size: 10px;">dupliquer</p></li> </a>
+                        {% endif %}
+                    <a href="#" class="text-cam col btn-outline-light"  title="partager"><li class="fa fa-share"><p style="font-size: 10px;">partager</p></li></a>
+                        {% if liste_maison.category_id != 8 %}
+                        <a href="#" class="text-cam col btn-outline-light" data-backdrop="static" data-toggle="modal" data-target="#modalConfirmModifier{{ liste_maison.id }}" data-dismiss="modal"  title="modifier"><li class="fa fa-upload"><p style="font-size: 10px;">modifier</p></li></a>
+                        <a href="#" class="text-cam col btn-outline-light" data-backdrop="static" data-toggle="modal" data-target="#modalConfirmSuprimer{{ liste_maison.id }}" data-dismiss="modal"><li class="fa fa-times"><p style="font-size: 10px;">supprimer</p></li>  </a>
+                        {% endif %}
+                        <a href="#" class="text-cam col btn-outline-light"  title="commenter" data-toggle="modal" data-target="#message{{ liste_maison.id }}"><li class="fa fa-comment"><p style="font-size: 10px;">message</p></li></a>
+                        <div class="modal fade" id="message{{ liste_maison.id }}" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                          <div class="modal-dialog">
+                            <div class="modal-content">
+                              <div class="modal-header">
+                                <h5 class="modal-title" id="staticBackdropLabel">Messagerie</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                  <span aria-hidden="true">&times;</span>
+                                </button>
+                              </div>
+                              <div class="modal-body">
+                                kj
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+
+                    {% elif liste_maison.etat == 2 %}
+                        <a href="#" class="text-cam  btn btn-outline-success" data-backdrop="static" data-toggle="modal" data-target="#modalConfirmAccepter{{ liste_maison.id }}" data-dismiss="modal">Accepter La reservation </a>
+                        <p class="text-cam"> Votre {{ liste_maison.category }} est actuèlement invisible par la clientelle <mark>car elle à été reservé(e)</mark>. veuiller choisir une opération </p>
+                        <a href="#" class="text-cam  btn btn-outline-danger" data-backdrop="static" data-toggle="modal" data-target="#modalConfirmRefuser{{ liste_maison.id }}" data-dismiss="modal">Refuser La reservation </a>
+
+                    {% elif liste_maison.etat == 3 %}
+                       <a href="{% url 'camer_house:enregistrement22_ch' liste_maison.id %}" title="detail" class="text-cam  btn btn-outline-info">
+                        Detail
+                        </a>
+                        <a href="#" data-backdrop="static" data-toggle="modal" data-target="#information{{ liste_maison.id }}" data-dismiss="modal"  class="text-cam  btn btn-outline-primary"  id="Occuper{{ liste_maison.id }}">{{ liste_maison.category }} Occupé(e) </a>
+                        <a href="#" class="text-cam  btn btn-outline-warning"  data-backdrop="static" data-toggle="modal" data-target="#RendreNonOccuper{{ liste_maison.id }}" data-dismiss="modal">Rendre cet(cette) {{ liste_maison.category }} comme non Occupé(e) </a>
+
+
+                        <div class="modal fade" id="RendreNonOccuper{{ liste_maison.id }}" tabindex="-1" data-backdrop="static" aria-labelledby="Reserver{{ list.id }}" aria-hidden="true">
+                              <div class="modal-dialog">
+                                <div class="modal-content">
+                                  <div class="modal-header">
+                                          <h5 class="modal-title text-cam">Rendre cet(cette) {{ liste_maison.category }} comme non Occupé(e) </h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                      <span aria-hidden="true">&times;</span>
+                                    </button>
+                                  </div>
+
+                                    <div class="modal-body">
+                                    {% if montant < 1000 %}
+
+                                            <p class="text-cam">les frais de cette Opération est de 1000 Fcfa</p>
+                                        <p class="text-cam">votre solde est insufisant pour éffectuer cette opération . <br /> veuiller recharger votre compte</p>
+
+                                      {% endif %}
+                                    {% if montant >= 1000 %}
+                                    <p class="text-cam">en confirmant cette Opération, vous êtes à 100% propriétaire de cette {{ liste_maison.category }}. votre {{ liste_maison.category }} est maintenant disponible
+                                    pour tout personne voulant la louer ou achetter</p>
+                                    {% endif %}
+                                  </div>
+                                  <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                               {% if montant >= 1000 %}
+                                   <form action="" method="post" novalidate>
+                                       {% csrf_token %}
+                                       {{ formRestorer.proprietaire }}
+                                           <input type="hidden" name="montant" value="0">
+                                           <input type="hidden" name="puol" value="{{ liste_maison.id }}" />
+
+                                           <button  type="submit" class="btn btn-success">Confirmer l'oppération</button>
+                                   </form>
+                               {% endif %}
+                                  </div>
+
+                                </div>
+                              </div>
+                        </div>
+
+
+                        <div class="modal fade " id="information{{ liste_maison.id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                             <div class="modal-dialog">
+                                <div class="modal-content">
+                                  <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">Information sur le Locataire</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                      <span aria-hidden="true">&times;</span>
+                                    </button>
+                                  </div>
+                                  <div class="modal-body">
+                                      <p class="text-cam" id="pay"></p>
+                                      <p class="text-cam" id="code"></p>
+                                      <p class="text-cam" id="number"></p>
+                                      <p class="text-cam" id="date"></p>
+
+                                  </div>
+                                </div>
+                              </div>
+                        </div>
+
+                        <script>
+                        $(document).ready(function () {
+                            $("#Occuper{{ liste_maison.id }}").click(function() {
+                        var etab = {{liste_maison.id}};
+                        $.ajax({
+                            url:  "{% url 'camer_house:location' %}",
+                            method: "POST",
+                            data: 'id='+ etab,
+                            dataType: "json",
+                            success: function(data)
+                            {
+                                x=data.donnee;
+                                for(i=0; i<x.length; i++ ){
+                                    var phonenumber = x[i].phonenumber;
+                                    var day = new Date(x[i].day*1000) ;
+                                    var code = x[i].code;
+                                    var pay = x[i].pay;
+                                }
+                                $(" #pay").html("pays :  "+ pay);
+                                $(" #code").html("code :  "+ code);
+                                $(" #number").html("numero de téléphonne :  "+ phonenumber);
+                                $(" #date").html("date de location :  "+ day.getDate()+
+                                                                  "-"+(day.getMonth()+1)+
+                                                                  "-"+day.getFullYear()+
+                                                                  " à "+day.getHours()+
+                                                                  "H:"+day.getMinutes());
+
+                            }
+                        });
+                    });
+
+                        })
+                        </script>
+
+                    {% endif %}
+                    {% if liste_maison.etat == 0 %}
+                        <a href="{% url 'camer_house:enregistrement22_ch' liste_maison.id %}" class="text-cam btn btn-outline-info">Finaliser</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+                        <div  class="modal fade"  id="modalConfirmAccepter{{ liste_maison.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div  class="modal-dialog modal-sm modal-notify modal-danger" role="document">
+                                <div  class="modal-content text-center">
+                                    <div  class="modal-header d-flex justify-content-center" style="color: #FFF; background-color: #28a745;">
+                                        <p  class="heading">ête vous sure?</p>
+                                    </div>
+                                    <div  class="modal-body">
+                                        <p class="text-cam">après confirmation,
+                                            {% if liste_maison.category_id == 1 or liste_maison.category_id == 9 or liste_maison.category_id == 8 %}
+                                                cette
+                                            {% else %}
+                                                cet
+                                            {% endif %}
+                                            <mark>  {{ liste_maison.category }} </mark> seras invisible par ceux qui en ont besoin car ces marquée  comme occupé(e). le jour que le propriétaire actuel déciderat de sortir, vous pourrez ensuite la marquée comme étant libre</p>
+                                        <i  class="fa fa-check fa-4x"></i>
+                                    </div>
+                                    <!--Footer-->
+                                    <div  class="modal-footer justify-content-center">
+                                        <a href="{% url 'camer_house:Confirmer_Reservation_cam' liste_maison.id %}"  class="btn  btn-outline-success">Confirmer</a>
+                                        <a type="button"  class="btn  btn-outline-primary waves-effect"  data-dismiss="modal">Non</a>
+                                    </div></div>
+                                <!--/.Content-->
+                            </div>
+                        </div>
+
+                        <div  class="modal fade"  id="modalConfirmRefuser{{ liste_maison.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div  class="modal-dialog modal-sm modal-notify modal-danger" role="document">
+                                <div  class="modal-content text-center">
+                                    <div  class="modal-header d-flex justify-content-center" style="color: #FFF; background-color: #dc3545;">
+                                        <p  class="heading">ête vous sure?</p>
+                                    </div>
+                                    <div  class="modal-body">
+                                        <p class="text-cam">après confirmation, tous les données en rapport avec
+                                            {% if liste_maison.category_id == 1 or liste_maison.category_id == 9 or liste_maison.category_id == 8 %}
+                                                la
+                                            {% elif liste_maison.category_id == 2 or liste_maison.category_id == 3 or liste_maison.category_id == 6 or liste_maison.category_id == 7 %}
+                                                l'
+                                            {% else %}
+                                                le
+                                            {% endif %}
+                                            <mark>  {{ liste_maison.category }} Reserver </mark> seras annulé.</p>
+                                        <i  class="fa fa-times fa-4x"></i>
+                                    </div>
+
+                                    <!--Footer-->
+                                    <div  class="modal-footer justify-content-center">
+                                        <a  href="{% url 'camer_house:supprimer_Reserv_cam' liste_maison.id %}"  class="btn  btn-outline-danger">OUI</a>
+                                        <a type="button"  class="btn  btn-outline-primary waves-effect"  data-dismiss="modal">NON</a>
+                                    </div>
+                                </div>
+                                <!--/.Content-->
+                            </div>
+                        </div>
+
+
+                        <div  class="modal fade"  id="modalConfirmSuprimer{{ liste_maison.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div  class="modal-dialog modal-sm modal-notify modal-danger" role="document">
+                                <div  class="modal-content text-center">
+                                    <div  class="modal-header d-flex justify-content-center" style="color: #FFF; background-color: #dc3545;">
+                                        <p  class="heading">ête vous sure?</p>
+                                    </div>
+                                    <div  class="modal-body">
+                                        <p class="text-cam">après confirmation, tous les données en rapport avec
+                                            {% if liste_maison.category_id == 1 or liste_maison.category_id == 9 or liste_maison.category_id == 8 %}
+                                                la
+                                            {% elif liste_maison.category_id == 2 or liste_maison.category_id == 3 or liste_maison.category_id == 6 or liste_maison.category_id == 7 %}
+                                                l'
+                                            {% else %}
+                                           <i  class="fa fa-times fa-4x"></i>
+                                           le
+                                            {% endif %}
+                                            <mark>  {{ liste_maison.category }} </mark> serons supprimées.</p>
+                                      </div>
+
+                                    <!--Footer-->
+                                    <div  class="modal-footer justify-content-center">
+                                        <a  href="{% url 'camer_house:supprimer_cam' liste_maison.id %}"  class="btn  btn-outline-danger">OUI</a>
+                                        <a type="button"  class="btn  btn-outline-primary waves-effect"  data-dismiss="modal">NON</a>
+                                    </div>
+                                </div>
+                                <!--/.Content-->
+                            </div>
+                        </div>
+                        <div  class="modal fade"  id="modalConfirmDupliquer{{ liste_maison.id }}" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div  class="modal-dialog modal-sm modal-notify modal-danger" role="document">
+                                <div  class="modal-content text-center">
+                                    <div  class="modal-header d-flex justify-content-center" style="color: #FFF; background-color: #28a745;">
+                                        <p  class="heading">ête vous sure?</p>
+                                    </div>
+                                    <div  class="modal-body">
+                                        <p class="text-cam">après confirmation,
+                                            {% if liste_maison.category_id == 1 or liste_maison.category_id == 9 or liste_maison.category_id == 8 %}
+                                                une
+                                            {% else %}
+                                                un
+                                            {% endif %}
+                                            <mark>  {{ liste_maison.category }} </mark> seras créé avec toutes les informations simmilaires à celle si.</p>
+                                        <i  class="fa fa-check fa-4x"></i>
+                                    </div>
+                                    <!--Footer-->
+                                    <div  class="modal-footer justify-content-center">
+                                        <a href="{% url 'camer_house:dupliquer_cam' liste_maison.id %}"  class="btn  btn-outline-success">Confirmer</a>
+                                        <a type="button"  class="btn  btn-outline-primary waves-effect"  data-dismiss="modal">Non</a>
+                                    </div></div>
+                                <!--/.Content-->
+                            </div>
+                        </div>
+                        <div class="modal fade" id="modalConfirmModifier{{ liste_maison.id }}" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                              <div class="modal-dialog">
+                                <div class="modal-content">
+                                  <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel">Modifiez votre <mark>{{ liste_maison.category }}</mark></h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                      <span aria-hidden="true">&times;</span>
+                                    </button>
+                                  </div>
+                                  <div class="modal-body">
+                                    <form method="post" action="">
+                                        {% csrf_token %}
+                                    <input type="hidden" name="montant" value="0" id="id_montant">
+                                       {% if liste_maison.category_id == 1 or liste_maison.category_id == 4 or liste_maison.category_id == 5 or liste_maison.category_id == 6 or liste_maison.category_id == 7%}
+                                           {{ form1.as_p }}
+                                       {% elif liste_maison.category_id == 2 or liste_maison.category_id == 3 %}
+                                           {{ form3.as_p }}
+                                       {% elif liste_maison.category_id == 9 %}
+                                           {{ form2.as_p }}
+                                       {% endif %}
+                                          <input type="hidden" name="id" value="{{ liste_maison.id}}">
+
+                                           <input type="hidden" name="proprietaire" value="0">
+                                           <input type="hidden" name="puol" value="0">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Fermer</button>
+                                        <button type="submit" class="btn btn-primary">Valider</button>
+
+                                    </form>
+                                  </div>
+                                  <div class="modal-footer">
+                                  </div>
+                                </div>
+                              </div>
+                        </div>
+
+                    {% endfor %}
+                {% else %}
+                   <p class="text-cam">Vous n'avez pas de House </p>
+                {% endif %}
+            </div>
+        <script>
+                         var mot = document.getElementById('message')
+                         if(mot){
+                         if (mot.innerText.length > 0){
+                             function charger(){
+                                    setTimeout( function(){
+                                        $('#message').slideUp();
+                                        }, 15000); // on exécute le chargement toutes les 1 secondes
+                                }
+                                        charger();
+
+                         }
+                         }
+
+
+        </script>
+
+    </div>
+
+{% endblock contenu_ch %}

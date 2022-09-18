@@ -1,0 +1,93 @@
+{% extends 'myhouse.html' %}
+{% block title %}
+    CONNEXION
+{% endblock %}
+{% block body %}
+    <div class="container">
+        <div class="col-lg-5 m-auto">
+            <form action="" method="post" novalidate>
+                {% csrf_token %}
+                <div class="card mt-5 bg-light">
+                <div class="card-title text-center mt-3">
+                    <img src="../../../media/index8.png" class="rounded" style="width: 150px; height: 150px" alt="">
+                </div>
+                {% if messages %}
+                       {% for message in messages %}
+                              <div class="alert alert-danger text-center"><strong>{{ message }}</strong></div>
+                       {% endfor %}
+
+                {% endif %}
+                    <div class="card-body">
+                    <div class="input-group mb-3">
+                        {% if form.username.erros %}
+                            {% for error in form.username.errors %}
+                                <small class="text-danger">{{ error }}</small>
+                            {% endfor %}
+                        {% endif %}
+                        <div class="input-group prepend">
+                            <span class="input-group-text">
+                                <i class="fa fa-user fa-2x"></i>
+                            </span>
+                                {{ form.username }}
+                        </div>
+                    </div>
+
+                    <div class="input-group mb-3">
+                        {% if form.password1.errors %}
+                            {% for error in form.pwd.errors %}
+                                <small class="text-danger"> {{ error }} </small>
+                                {% endfor %}
+                        {% endif %}
+                        <div class="input-group prepend">
+                            <span class="input-group-text">
+                             <i class="fa fa-lock fa-2x"></i>
+                            </span>
+                            {{ form.password1 }}
+                        </div>
+                    </div>
+
+                    </div>
+                    <div class="card-footer text-center">
+                        <button class="btn btn-primary btn-block">se connecter</button>
+                    </div>
+                    <p> vous n'avez pas de compte?
+                        <a href="{% url 'signin' %}">creer un compte</a>
+                    </p>
+                </div>
+            </form>
+
+        </div>
+    </div>
+    <style>
+    body{
+        background: url("../../../media/83.jpg");
+        background-size: 100%;
+        background-repeat: no-repeat;
+        min-height: 1000%;
+        opacity: 0.8;
+    }
+    </style>
+
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

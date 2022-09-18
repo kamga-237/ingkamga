@@ -1,0 +1,292 @@
+{% extends 'myhouse.html' %}
+{% block title %} Camer House {% endblock title %}
+{% block body %}
+    {% if user.is_authenticated %}
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+
+<boris>
+   <nav>
+       <div class="menu-items">
+            <ul class="nav-links">
+            <li>
+                <div class="row">
+                    <button class="col-lg-4 text-cam link-name btn btn-outline-light" title="votre compte est de {{ montant }}"> {{ montant }}</button>
+                    <button class="col-lg-4 text-cam link-name btn btn-outline-success" title="recharger votre compte"  data-toggle="modal" data-target="#exampleModal"><i class="fa fa-address-card size"></i></button>
+                    <button class="col-lg-4 text-cam link-name btn btn-outline-success" title="pourquoi recharger mon compte"  data-toggle="modal" data-target="#exampleModalpq"><i class="fa fa-info size"></i></button>
+                </div>
+            </li>
+            <li>
+                <a class="logo-name link-name"href="{% url 'camer_house:home_ch' %}">
+                    <i class="fa fa-cog"></i>
+                    <span class="link-name">My House</span>
+                </a>
+
+            </li>
+                <input type="hidden" class="{{ lien1 }}">
+                {% for categori in sategory %}
+                <li  title="{{ categori.name.capitalize }}">
+                    <a class="link-name
+   {% if categori.id == 1 %} un
+   {% elif categori.id == 2%} deux
+   {% elif categori.id == 3%} trois
+   {% elif categori.id ==  4%} quatre
+   {% elif categori.id ==  5%} cinq
+   {% elif categori.id == 6%} six
+   {% elif categori.id == 7%} sept
+   {% elif categori.id == 8%} huit
+   {% elif categori.id == 9%} neuf
+{% endif %}
+
+                    "href="{% url 'camer_house:liste_category' categori.id  %}">
+                        <i
+                            {% if categori.id == 1 or categori.id == 3%}
+                                class="fa fa-home"
+                            {% elif categori.id == 2 %}
+                                class="fa fa-hotel"
+                            {% elif  categori.id == 6 or categori.id == 7%}
+                                class="fa fa-building" {% if categori.id == 6 %} style="color: #28a745;" {% endif %}
+                            {% elif  categori.id == 4 or categori.id == 5%}
+                                class="fa fa-shopping-basket"{% if categori.id == 4 %} style="color: #28a745;" {% endif %}
+                            {% elif categori.id == 8 %}
+                                class="fa fa-university"
+                            {% elif categori.id == 9 %}
+                            class="fa fa-industry"
+
+                        {% endif %}></i>
+                        <span class="link-name">{{ categori.name.capitalize }}</span>
+                    </a>
+                </li>
+            {% endfor %}
+            </ul>
+
+            <ul class="logout-mode">
+                <li class="deido">
+                     {% if user.is_authenticated and has_perm%}
+                        <a href="{% url 'camer_house:proprieter_ch' %}" class="{{ lien0 }}">
+                                <i class='fa fa-cog' ></i>
+                                <span class="link-name ">Administration</span>
+                            </a>
+                    {% elif user.is_authenticated and has_perm == False %}
+                            <a href="#" data-toggle="modal" data-target="#exampleModal1">
+                                <i class='fa fa-flag' ></i>
+                                <span class="link-name">Obtenir un Compte Admin</span>
+                            </a>
+
+                    {% endif %}
+                    </li>
+
+                <li class="mode">
+                    <a href="#"class="link-name">
+                    <span class="link-name">                        <i class="fa fa-moon"></i>
+</span>
+                </a>
+
+                <div class="mode-toggle link-name">
+                  <span class="switch"></span>
+                </div>
+            </li>
+            </ul>
+        </div>
+    </nav>
+
+    <section class="dashboard">
+        <div class="top">
+            <i class="fa fa-bars sidebar-toggle"></i>
+        <div class=" navbar navbar-expand-lg ">
+             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                 <i class="fa fa-bars"></i>
+             </button>
+
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav mr-auto">
+                        <a class="btn btn-outline-success text-cam" href="{% url 'camer_house:liste_category_un' %}">camHouse</a>
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <a class=" btn btn-outline-secondary text-cam" href="#">camSchool</a>
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <a class=" btn btn-outline-primary text-cam" href="#">camSarl</a>
+                                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <form class="form-inline my-2 my-lg-0">
+                        <input class="form-control mr-sm-2 text-cam" type="search" placeholder="Search" aria-label="Search">
+                        <button class="btn btn-outline-success my-2 my-sm-0 text-cam" type="submit">Search</button>
+                    </form>
+                    &nbsp;&nbsp;&nbsp;
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'logout' %}" class="btn btn-outline-danger me-2 text-cam">déconnecté</a>
+                    {% else %}
+                        <a href="{% url 'login' %}" class="btn btn-outline-info me-2 text-cam">connexion</a>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+        </div>
+
+        <div class="dash-content">
+            <br>
+            {% block contenu_ch %}
+                <span class="text-cam">tous s'afficherat ici(mais actuelement reserver à la parti paramètre)</span>
+
+            {% endblock contenu_ch %}
+        </div>
+
+    </section>
+</boris>
+        <div class="modal fade" data-backdrop="static" data-keyboard="false" id="exampleModalpq" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">pourquoi recharge mon compte</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+          <h5>Reservation</h5>
+          <p class="text-cam">Afin de garantir a 50% d'être propriétaire d'une maisons ou une des catalogues situer a la gauche de votre écran, vous devez effecturer une <mask>reservation</mask> qui seras
+          par la suite confirmer par le propriétaire. étant donnée que, apres reservation l'objet reservé ne seras plus accessible sur le site car vous ête déja en cour d'être propriétaire.
+          Cette opération vous couteras 1000 Fcfa. <br> <strong>NB</strong> : rappelon aussi que si après 7 jour vous avez pas finaliser le procéssus avec le propriétaire de l'objet(appartement, studio, maison ect...),
+          la reservation seras automatiquement annuler.</p>
+          <hr>
+          <h5>Consultation</h5>
+          <p class="text-cam">Afin de beneficier de la surretée de la propriéter et d'évitée des dépences en temps et en argent, l'application met à votre disposition des outils(messagerie, info sur le propriétaire, GPS ect.... ) pour vous rendre la vie facile
+          <br> <strong>NB</strong> : rappelon aussi que si après 2 jour vous avez pas finaliser le procéssus de consultation, l'objet(appartement, studio, maison ect...),
+           seras automatiquement annuler.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+        <div class="modal fade" data-backdrop="static" data-keyboard="false" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Chargement du compte</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+          <form action="" method="post" novalidate>
+              {% csrf_token %}
+                        <label for="id_montant">Montant </label>
+          {{ formCompte.montant }}
+
+          {{ formCompte.day }}
+              <input type="hidden" name="proprietaire" value="-1" />
+              <input type="hidden" name="puol" value="-1" />
+
+              <div class="card-footer text-center">
+                        <button class="btn btn-primary btn-block">Recharger</button>
+                    </div>
+          </form>
+      </div>
+    </div>
+  </div>
+</div>
+     <div class="modal fade" data-backdrop="static" data-keyboard="false" id="exampleModal1" tabindex="-1" aria-labelledby="exampleModal1Label" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+              <h5 class="modal-title text-cam">Creer un compte Admin</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+
+        <div class="modal-body">
+        {% if montant < 1000 %}
+
+                <p class="text-cam">Afin de pouvoir mettre un ou plusieurs des catalogues situer à la gauche de votre écrant (maison, hotel, auberge studio, appartement ect...) en ligne, les frais de cette opération est de 1000 Fcfa</p>
+            <p class="text-cam">votre solde est insufisant pour éffectuer cette opération . <br /> veuiller recharger votre compte</p>
+
+          {% endif %}
+        {% if montant >= 1000 %}
+        <p class="text-cam">en cliquant sur le bouton <mask>Confirmer la creation</mask>  vous aurez la possibliter de creer et administrer un ou plusieurs des catalogues situer à la gauche de votre écrant (maison, hotel, auberge studio, appartement ect...)  </p>
+        {% endif %}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+   {% if montant >= 1000 %}
+       <button id="EnvoiCreer" data-dismiss="modal" type="button" class="btn btn-success">Confirmer la creation</button>
+
+            <script>
+            $("#EnvoiCreer").click(function () {
+                var etab = "1";
+                        $.ajax({
+                            url:  "{% url 'camer_house:CAD' %}",
+                            method: "POST",
+                            data: 'id='+ etab,
+                            dataType: "json",
+                            success: function(data)
+                            {
+                                if (data.resultat == "yes"){
+                                alert("opération éffectuer avec success.");
+                            }
+                            else {
+                                    alert(data.resultat)
+                                }
+                            }
+                        });
+            })
+            </script>
+   {% endif %}
+      </div>
+
+    </div>
+  </div>
+</div>
+    <style>
+    .{{ lien1 }} {
+        background-color: var(--a-color);
+    color: rgb(20, 20, 20);
+    border-radius: 5px;
+}
+
+    </style>
+    <script type="text/javascript">
+    const body = document.querySelector("boris"),
+      modeToggle = body.querySelector(".mode-toggle");
+      sidebar = body.querySelector("nav");
+      sidebarToggle = body.querySelector(".sidebar-toggle");
+
+let getMode = localStorage.getItem("mode");
+if(getMode && getMode ==="dark"){
+    body.classList.toggle("dark");
+}
+
+let getStatus = localStorage.getItem("status");
+if(getStatus && getStatus ==="close"){
+    sidebar.classList.toggle("close");
+}
+
+modeToggle.addEventListener("click", () =>{
+    body.classList.toggle("dark");
+    if(body.classList.contains("dark")) {
+      localStorage.setItem("mode", "dark");
+    }else{
+        localStorage.setItem("mode", "light");
+    }
+});
+
+sidebarToggle.addEventListener("click", () => {
+    sidebar.classList.toggle("close");
+    if(sidebar.classList.contains("close")){
+         localStorage.setItem("status", "close");
+    }else{
+        localStorage.setItem("status", "open");
+    }
+})
+
+    // activtion du link
+
+
+
+
+    </script>
+        {% else %}
+        Erreur 404 sur
+                <a href="{% url 'login' %}" class="btn btn-outline-info me-2 text-cam">connexion</a>
+        {% endif %}
+
+
+{% endblock body %}
