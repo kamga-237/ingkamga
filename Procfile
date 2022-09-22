@@ -1,1 +1,1 @@
-web: gunicorn motouom.wsgi
+web: gunicorn app:app
