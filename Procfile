@@ -1,1 +1,1 @@
-web: gunicorn app:app
+web: gunicorn motouom.wsgi --log-file -
